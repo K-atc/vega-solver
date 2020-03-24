@@ -9,7 +9,7 @@ with open('LICENSE') as f:
 
 setup(
     name='vega-solver',
-    version='0.0.1',
+    version='0.0.2',
     description='All sat style yet another theorem solver',
     long_description=readme,
     long_description_content_type='text/x-rst',
