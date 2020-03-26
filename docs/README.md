@@ -1,9 +1,8 @@
-vega: Theorem Solver To Find All Satisfiable Values
+vega: All Sat Style Theorem Solver
 ====
 
-![Python test](https://github.com/K-atc/vega-solver/workflows/Python%20test/badge.svg)
 
-![](logo.png) TODO: Add Logo
+<img src="./vega_logo_with_letter_LOGO_PORTRAIT.png" width="120pt"/>
 
 *vega* is yet another theorem solver and answers all values which satisfies given constraints on each variable as a model (in sat solver, this behavior is called as all sat solver).
 
@@ -12,20 +11,34 @@ For example, if there're variable x ∈ {a,b,c} and constraints x = a ∧ x ≠ 
 See [white paper](./White-Paper-of-vega.pdf) to find out detailed technical background.
 
 
+Requirements
+----
+* Python3
+* Pypy3 (Optional)
+    * Recommend use Pypy3 to speed up execution
+
+
 Remarks
 ----
-- vega has similar API to z3py.
+* vega is implemented as pypi library 
+* vega has similar API to z3py.
 
 
 How to setup
 ----
+All you have to do is pip install `vega-solver`.
+
 ```shell
 pip3 install vega-solver
 ```
 
 
-Test
+How to test
 ----
+|CI test status|
+|:-:|
+|![Python test](https://github.com/K-atc/vega-solver/workflows/Python%20test/badge.svg)|
+
 You can test if vega works correctly using bundled test scripts. 
 
 Clone this repository and run:
@@ -84,9 +97,67 @@ Model(sat=Sat, {x: {c, b}, y: Ref(x), z: Ref(x)})
 {b, c}
 ```
 
-We found that vega models *x* to be *b* or *c* and this is correct answer for this constraint.
+We found that vega models that *x* is *b* or *c* and this is correct solution for this constraint.
 
 See [test.py](../tests/test.py) for more examples.
 
 ### Abstract Interpretation
-TBD
+Abstract interpretation is a analysis method to obtation information about targetted computer program's semantics.
+In this method, a program is executed using abstracted values not concrete values. 
+
+This PoC performs abstract interpretation on 3 types (*Int*, *Pointer*, *PointerOffset*) and reasons that type of register `rdx` is not *Int* in following asembly code.
+
+```assembly
+ 76e:	48 8d 05 cb 08 20 00 	lea    rax,[rip+0x2008cb]
+ 775:	48 01 d0             	add    rax,rdx
+```
+
+in `sample/sample_abstract_interpretation.py`:
+
+```python
+from vega import *
+
+Int, Pointer, PointerOffset = Value('Int'), Value('Pointer'), Value('PointerOffset')
+Any = Sort('Any', [Int, Pointer, PointerOffset])
+
+def symvar(name):
+    return Variable(name, Any)
+
+def Reg(name):
+    return symvar("Reg_{}".format(name))
+
+def add(dst, src):
+    return Implies(
+        Not(Eq(dst, Int)),
+        Not(Eq(src, Int))
+    )
+
+def lea(dst, base):
+    return And(
+        Not(Eq(dst, Int)),
+        Not(Eq(base, Int)),
+    )
+
+
+s = Solver(Any)
+
+s.add(lea(Reg('76e_rax'), Reg('76e_rip')))
+
+s.add(add(Reg('775_rax'), Reg('775_rdx')))
+s.add(Eq(Reg('775_rax'), Reg('76e_rax')))
+
+m = s.model()
+print(m[Reg('775_rdx')])
+```
+
+Note that this solver:
+
+* assumes type of dst is not *Int* on each `lea` instruction, and
+* assumes type of src is not *Int* if type of dst is not *Int* on each `add` instruction.
+
+Execution result:
+
+```
+$ python3 sample/sample_abstract_interpretation.py 
+{Pointer, PointerOffset}
+```
