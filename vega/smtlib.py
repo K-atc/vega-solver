@@ -134,12 +134,20 @@ def parse_smt2_file(file_name):
     with open(file_name) as f:
         parser = ExtendedSmtLibParser()
         script = parser.get_script(cStringIO(f.read()))
+
+        ### Transform to expressions
         expr = []
         for cmd in script:
             res = parse_cmd(cmd)
             if res:
                 expr += res
-        return expr, sorts
+
+        ### Calcuate domain
+        domain = set()
+        for sort in sorts.values():
+            domain |= sort.values
+
+        return expr, Sort('Domain', domain)
 
 class SmtlibCapability:
     ### serialize constraints

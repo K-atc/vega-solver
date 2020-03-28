@@ -1,10 +1,8 @@
 from vega import *
 
-expr, sorts = parse_smt2_file("study-z3.smt")
+expr, domain = parse_smt2_file("study-z3.smt")
 print(expr)
-print("sorts = {}".format(sorts))
-
-domain = sorts['Any']
+print("Domain = {}, Domain.values = {}".format(domain, domain.values))
 
 s = Solver(domain)
 s.add(*expr)
