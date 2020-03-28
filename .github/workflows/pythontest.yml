@@ -23,6 +23,14 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: Test
+    - name: Install develop
       run: |
-        python3 -m tests.test
+        python3 setup.py develop --user
+    - name: Test solver
+      run: |
+        python3 tests/test.py
+    - name: Test smtlib and command line
+      run: |
+        python3 tests/test_smtlib.py tests/test_smtlib_1.smt test.smt && vega -smt2 test.smt
+      env:
+        PATH: /home/runner/.local/bin:$PATH

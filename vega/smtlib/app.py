@@ -31,6 +31,8 @@ def evaluate_smt2_file(file):
         elif cmd.name in ['check-sat']:
             res = check_sat(expr, sorts)
             print(res)
+            if not res:
+                exit(1)
         elif cmd.name in ['set-info']:
             pass
         else:

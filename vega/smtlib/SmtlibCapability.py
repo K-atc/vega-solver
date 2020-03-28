@@ -1,4 +1,5 @@
 class SmtlibCapability:
+
     ### serialize constraints
     def to_smt2(self):
         res = []
