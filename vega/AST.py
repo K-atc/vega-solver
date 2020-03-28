@@ -51,6 +51,9 @@ class Variable(AST):
         else:
             return set()
 
+    def to_smt2(self):
+        return self.name
+    
 class Sort(AST):
     def __init__(self, name, values):
         assert isinstance(name, str)
@@ -62,8 +65,14 @@ class Sort(AST):
     def __repr__(self):
         return "{}({})".format(self.__class__.__name__, self.name)
 
+    def __hash__(self):
+        return hash(self.__repr__())
+
     def __eq__(a, b):
         return a.name == b.name and a.values == b.values
+
+    def to_smt2(self):
+        return self.name
 
 class Value(AST):
     def __init__(self, name):
@@ -81,6 +90,9 @@ class Value(AST):
 
     def __eq__(a, b):
         return a.name == b.name
+
+    def to_smt2(self):
+        return self.name
 
 ### Used to describe equality x == y |-> x = Ref(y)
 class Ref(AST):
@@ -107,6 +119,9 @@ class Const(AST):
     def getVariables(self):
         return set()
 
+    def to_smt2(self):
+        return self.__class__.__name__
+
 class NOp(AST):
     def __init__(self, *v):
         assert checkAllItemsAreAST(*v), "v={}".format(v)
@@ -123,6 +138,9 @@ class NOp(AST):
 
     def getConditionVariables(self, is_parent_condition=False):
         return reduce(lambda r, expr: r | expr.getConditionVariables(is_parent_condition), self.v, set())
+
+    def to_smt2(self):
+        return "({} {})".format(self.__class__.__name__.lower(), ' '.join([x.to_smt2() for x in self.v]))
 
 class UniOp(NOp):
     def __init__(self, v1):
@@ -141,6 +159,9 @@ class UniOp(NOp):
     def getConditionVariables(self, is_parent_condition=False):
         return self.v1.getConditionVariables(is_parent_condition)
 
+    def to_smt2(self):
+        return "({} {})".format(self.__class__.__name__.lower(), self.v1.to_smt2())
+
 class BinOp(NOp):
     def __init__(self, v1, v2):
         assert isinstance(v1, AST)
@@ -155,20 +176,13 @@ class BinOp(NOp):
         return a.v1 == b.v1 and a.v2 == b.v2
 
     def getVariables(self):
-        # res = set()
-        # if isinstance(self.v1, Variable):
-        #     res.add(self.v1)
-        # elif isinstance(self.v1, NOp):
-        #     res |= self.v1.getVariables()
-        # if isinstance(self.v2, Variable):
-        #     res.add(self.v2)
-        # elif isinstance(self.v2, NOp):
-        #     res |= self.v2.getVariables()
-        # return res
         return self.v1.getVariables() | self.v2.getVariables()
 
     def getConditionVariables(self, is_parent_condition=False):
         return self.v1.getConditionVariables(is_parent_condition) | self.v2.getConditionVariables(is_parent_condition)
+
+    def to_smt2(self):
+        return "({} {} {})".format(self.__class__.__name__.lower(), self.v1, self.v2)
 
 ### Holds no AST nodes
 class Terminate(Const):
@@ -176,17 +190,20 @@ class Terminate(Const):
 
 ### True
 class Top(Const):
-    pass
+    def to_smt2(self):
+        return "true"
 
 ### False
 class Bot(Const):
-    pass
+    def to_smt2(self):
+        return "false"
 
 class Not(UniOp):
     pass
 
 class Eq(BinOp):
-    pass
+    def to_smt2(self):
+        return "(= {} {})".format(self.v1, self.v2)
 
 class And(NOp):
     pass
@@ -212,6 +229,9 @@ class If(AST):
     def getConditionVariables(self, is_parent_condition=False):
         return self.cond_clause.getConditionVariables(True)
 
+    def to_smt2(self):
+        return "(ite {} {} {})".format(self.cond_clause.to_smt2(), self.then_clause.to_smt2(), self.else_clause.to_smt2())
+
 class Implies(AST):
     def __init__(self, left, right):
         assert isinstance(left, AST)
@@ -227,3 +247,6 @@ class Implies(AST):
 
     def getConditionVariables(self, is_parent_condition=False):
         return self.left.getConditionVariables(True)
+
+    def to_smt2(self):
+        return "(=> {} {})".format(self.left.to_smt2(), self.right.to_smt2())
