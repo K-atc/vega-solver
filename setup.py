@@ -7,9 +7,12 @@ with open('README.rst') as f:
 with open('LICENSE') as f:
     license = f.read()
 
+with open('requirements.txt') as f:
+    install_requires = f.read().split('\n')
+
 setup(
     name='vega-solver',
-    version='0.0.2',
+    version='0.1.0',
     description='All sat style yet another theorem solver',
     long_description=readme,
     long_description_content_type='text/x-rst',
@@ -18,6 +21,14 @@ setup(
     url='https://github.com/K-atc/vega',
     license=license,
     packages=find_packages(exclude=('tests', 'docs')),
+
+    install_requires=install_requires,
+
+    entry_points={
+        "console_scripts": [
+            "vega = vega.app:main"
+        ]
+    },
 
     classifiers=[
         'Programming Language :: Python :: 3',

@@ -6,7 +6,7 @@ class Satisfiability:
         return a.__class__.__name__ == b.__class__.__name__
 
     def __repr__(self):
-        return "{}".format(self.__class__.__name__)
+        return "{}".format(self.__class__.__name__.lower())
 
 class Sat(Satisfiability):
     def __and__(self, other):

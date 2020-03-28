@@ -5,30 +5,28 @@ from ..Exceptions import *
 from ..AST import *
 from .ExtendedSmtLibParser import ExtendedSmtLibParser
 
-sorts = {}
-
-def parse_fnode(fnode, depth=1):
+def parse_fnode(fnode, sorts, depth=1):
     if fnode.is_and():
         res = []
         for x in fnode.args():
-            res.append(parse_fnode(x))
+            res.append(parse_fnode(x, sorts))
         return And(*res)
         # return And(*reduce(lambda r, x: r.append(parse_fnode(x)), fnode.args(), []))
     
     elif fnode.is_or():
         res = []
         for x in fnode.args():
-            res.append(parse_fnode(x))
+            res.append(parse_fnode(x, sorts))
         return Or(*res)
         # return Or(*reduce(lambda r, x: r.append(parse_fnode(x)), fnode.args(), []))
     
     elif fnode.is_not():
-        return Not(parse_fnode(fnode.args()[0]))
+        return Not(parse_fnode(fnode.args()[0], sorts))
     
     elif fnode.is_implies():
         return Implies(
-            parse_fnode(fnode.args()[0]), 
-            parse_fnode(fnode.args()[1])
+            parse_fnode(fnode.args()[0], sorts), 
+            parse_fnode(fnode.args()[1], sorts)
             )
     
     elif fnode.is_symbol():
@@ -47,28 +45,28 @@ def parse_fnode(fnode, depth=1):
             return Bot()
     
     elif fnode.is_equals():
-        return Eq(parse_fnode(fnode.args()[0]), parse_fnode(fnode.args()[1]))
+        return Eq(parse_fnode(fnode.args()[0], sorts), parse_fnode(fnode.args()[1], sorts))
     
     elif fnode.is_ite():
-        return If(parse_fnode(fnode.args()[0]), parse_fnode(fnode.args()[1]), parse_fnode(fnode.args()[2]))
+        return If(parse_fnode(fnode.args()[0], sorts), parse_fnode(fnode.args()[1], sorts), parse_fnode(fnode.args()[2], sorts))
     else:
         raise UnhandledCaseError("{}: node_type = {}".format(fnode, fnode.node_type()))
 
-def parse_cmd(cmd):
+def parse_cmd(cmd, sorts):
     if cmd.name == 'declare-datatypes':
         values = [Value(x) for x in cmd.args.values]
         sorts[cmd.args.name] = Sort(cmd.args.name, values)
         return []
     
     if cmd.name == 'declare-fun':
-        symbol_name = cmd.args[0].symbol_name()
-        sort_name = cmd.args[0].symbol_type().name
+        # symbol_name = cmd.args[0].symbol_name()
+        # sort_name = cmd.args[0].symbol_type().name
         return []
     
     if cmd.name == 'assert':
         res = []
         for x in cmd.args:
-            res.append(parse_fnode(x))
+            res.append(parse_fnode(x, sorts))
         return res
         # return reduce(lambda r, x: r.append(parse_fnode(x)), cmd.args, [])
 
@@ -82,7 +80,7 @@ def parse_smt2_file(file_name):
         sorts = {}
         expr = []
         for cmd in script:
-            res = parse_cmd(cmd)
+            res = parse_cmd(cmd, sorts) # NOTE: Do not replace `sorts` with `{}`. `sorts` passes referrence to `sorts`
             if res:
                 expr += res
 
