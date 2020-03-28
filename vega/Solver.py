@@ -1,3 +1,4 @@
+import sys
 from functools import reduce
 
 from .Exceptions import *
@@ -8,12 +9,13 @@ from .Model import Model
 from . import Satisfiability
 from .Feature import Feature, FeatureCapability
 from . import Tactic
+from .smtlib import SmtlibCapability
 
 sat = Satisfiability.Sat()
 unsat = Satisfiability.Unsat()
 unknown = Satisfiability.Unknown()
 
-class Solver(FeatureCapability):
+class Solver(FeatureCapability, SmtlibCapability):
     def __init__(self, domain, feature=Feature()):
         assert isinstance(domain, AST.Sort)
         assert isinstance(feature, Feature)
@@ -41,11 +43,12 @@ class Solver(FeatureCapability):
             if not v.sort == self.domain:
                 self.__addPostConstraint(AST.And(*[AST.Not(AST.Eq(v, t)) for t in self.domain.values - v.sort.values]))
 
-    def add(self, expr):
-        assert isinstance(expr, AST.AST)
-        self.constraints.append(expr)
-        for v in expr.getVariables():
-            self.declareVariable(v)
+    def add(self, *expr_list):
+        for expr in expr_list:
+            assert isinstance(expr, AST.AST), "expr={}".format(expr)
+            self.constraints.append(expr)
+            for v in expr.getVariables():
+                self.declareVariable(v)
         self.satisfiability = unknown
 
     def __addPostConstraint(self, expr):
@@ -72,6 +75,7 @@ class Solver(FeatureCapability):
                     if self.satisfiability == unsat:
                         break
                 except Exception as e:
+                    sys.stdout.flush()
                     print("[X] TheoremSolver::model::__model_constraints(): Exception occured in constraint #{}: {}".format(i, expr))
                     raise e
  
@@ -92,6 +96,7 @@ class Solver(FeatureCapability):
                         else:
                             unvisited_post_constraints.append(expr)
                     except Exception as e:
+                        sys.stdout.flush()
                         print("[X] TheoremSolver::model::__model_post_constraints(): Exception occured in post-constraint #{}: {}".format(i, expr))
                         raise e
                 
@@ -233,8 +238,8 @@ class Solver(FeatureCapability):
 
     ### @return: sat or unsat
     def __or_eq(self, left, right):
-        assert isinstance(left, AST.Variable)
-        assert isinstance(right, AST.Value)
+        assert isinstance(left, AST.Variable), "type(left)={}".format(type(left))
+        assert isinstance(right, AST.Value), "type(right)={}".format(type(right))
         
         self.variables[self.ref.getRef(left)].add(right)
         return sat
@@ -259,6 +264,12 @@ class Solver(FeatureCapability):
 
     ### Oneshot side-effect less satisfiability check
     def __check(self, expr):
+        if isinstance(expr, AST.Top):
+            return sat
+
+        if isinstance(expr, AST.Bot):
+            return unsat
+
         if isinstance(expr, AST.Eq):
             if isinstance(expr.v2, AST.Variable):
                 if self.ref.getRef(expr.v1) == self.ref.getRef(expr.v2):
@@ -375,6 +386,12 @@ class Solver(FeatureCapability):
         if isinstance(expr, AST.Terminate):
             ### Do nothing
             return sat
+
+        if isinstance(expr, AST.Top):
+            return sat
+
+        if isinstance(expr, AST.Bot):
+            return unsat
         
         if isinstance(expr, AST.Eq):
             if isinstance(self.feature.tactic, Tactic.WithReorder): self.visited_variables |= set(map(lambda v: self.ref.getRef(v), expr.getVariables()))

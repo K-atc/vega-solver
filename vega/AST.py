@@ -1,7 +1,10 @@
 from functools import reduce
 
 def checkAllItemsAreAST(*z):
-    return reduce(lambda r, x: r and isinstance(x, AST), z, True)
+    return reduce(lambda r, x: r and (isinstance(x, AST)), z, True)
+
+def checkAllItemsAreValue(*z):
+    return reduce(lambda r, x: r and (isinstance(x, Value)), z, True)
 
 class AST:
     def __repr__(self):
@@ -52,6 +55,7 @@ class Sort(AST):
     def __init__(self, name, values):
         assert isinstance(name, str)
         assert isinstance(values, set) or isinstance(values, list)
+        assert checkAllItemsAreValue(*values)
         self.name = name
         self.values = set(values)
 
@@ -168,6 +172,14 @@ class BinOp(NOp):
 
 ### Holds no AST nodes
 class Terminate(Const):
+    pass
+
+### True
+class Top(Const):
+    pass
+
+### False
+class Bot(Const):
     pass
 
 class Not(UniOp):

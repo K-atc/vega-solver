@@ -5,4 +5,6 @@ from .Functions import *
 from .Feature import Feature
 from . import Tactic
 
+from .smtlib import parse_smt2_file
+
 from .helper import *
