@@ -31,6 +31,6 @@ jobs:
         python3 tests/test.py
     - name: Test smtlib and command line
       run: |
-        python3 tests/test_smtlib.py tests/test_smtlib_1.smt test.smt && vega -smt2 test.smt
+        python3 tests/test_smtlib.py tests/test_smtlib_1.smt2 test.smt2 && vega -smt2 test.smt2
       env:
         PATH: /home/runner/.local/bin:$PATH
