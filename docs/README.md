@@ -21,7 +21,8 @@ Requirements
 Remarks
 ----
 * vega is implemented as pypi library 
-* vega has similar API to z3py.
+* vega has similar API to z3py. (see demo)
+* vega provides command line tool `vega` similar to `z3` (see demo)
 
 
 How to setup
@@ -40,12 +41,7 @@ How to test
 |![Python test](https://github.com/K-atc/vega-solver/workflows/Python%20test/badge.svg)|
 
 You can test if vega works correctly using bundled test scripts. 
-
-Clone this repository and run:
-
-```shell
-python3 -m tests.test
-```
+Clone this repository and run test commands in `.github/workflows/pythontest.yml`.
 
 
 Demo
@@ -160,4 +156,13 @@ Execution result:
 ```
 $ python3 sample/sample_abstract_interpretation.py 
 {Pointer, PointerOffset}
+```
+
+### SMT-LIB support
+TODO: What is SMT-LIB
+
+TODO: what is this and how to run
+
+```
+vega -smt2 hoge.smt
 ```
