@@ -267,6 +267,18 @@ class TestUnsat(unittest.TestCase):
         print(m)
         self.assertEqual(m.sat, unsat)
 
+    def test_contradiction(self):
+        print("\n[*] test contradiction: x == {Int}, y == {Pointer}, x == y")
+        s = Solver(Any)
+        s.add(And(
+            Eq(x, Int),
+            Eq(y, Pointer),
+            Eq(x, y)
+        ))
+        m = s.model()
+        print(m)
+        self.assertEqual(m.sat, unsat)
+
 class TestIfStatement(unittest.TestCase):
     def test_if_then(self):
         print("\n[*] Test if-then: x == {Pointer, PointerOffset}, If(x == Pointer, y == {Int}, y == {Pointer})")

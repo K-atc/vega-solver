@@ -233,7 +233,10 @@ class Solver(FeatureCapability, SmtlibCapability):
                     self.variables[ref_left] &= variables_left # intersection
 
                 self.variables[left] = AST.Ref(right)
-           
+
+                if not self.variables[ref_left]: # blank
+                    return unsat
+
             return sat
 
     ### @return: sat or unsat

@@ -36,6 +36,8 @@ class ExtendedSmtLibParser(SmtLibParser):
         expr = list(filter(lambda x: not x in ['(', ')'], expr))
         ### Register variable for `declare-fun`
         self.cache.bind(expr[0], self._get_var(expr[0], PySMTType(basename=expr[0])))
+        # for x in expr:
+        #     self.cache.bind(x, self._get_var(x, PySMTType(basename=x)))
         return SmtLibCommand(name="declare-datatypes", args=DataType(expr[0], expr[1:]))
 
     ### Overwrite definition of _cmd_declare_fun()

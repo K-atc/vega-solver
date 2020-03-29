@@ -6,8 +6,8 @@
 (declare-fun x () Any)
 (declare-fun y () Any)
 (assert
- (or (= x a) (= x c)))
+ (and (= x a) (= y b)))
 (assert
- (=> (and (distinct x b) true) (= y b)))
+ (= x y))
 (check-sat)
 (get-model)
