@@ -6,7 +6,7 @@ from pysmt.smtlib.parser import SmtLibParser
 from pysmt.smtlib.script import SmtLibCommand
 from pysmt.typing import PySMTType
 
-from ..Exceptions import *
+from ...Exceptions import *
 
 DataType = namedtuple('DataType', ['name', 'values'])
 
@@ -38,7 +38,7 @@ class ExtendedSmtLibParser(SmtLibParser):
         self.cache.bind(expr[0], self._get_var(expr[0], PySMTType(basename=expr[0])))
         # for x in expr:
         #     self.cache.bind(x, self._get_var(x, PySMTType(basename=x)))
-        return SmtLibCommand(name="declare-datatypes", args=DataType(expr[0], expr[1:]))
+        return SmtLibCommand(name="declare-datatypes", args=[DataType(expr[0], expr[1:])])
 
     ### Overwrite definition of _cmd_declare_fun()
     def _cmd_declare_fun(self, current, tokens):
