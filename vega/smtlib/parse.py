@@ -3,7 +3,8 @@ from six.moves import cStringIO
 
 from ..Exceptions import *
 from ..AST import *
-from .ExtendedSmtLibParser import ExtendedSmtLibParser
+from .pysmt.ExtendedSmtLibParser import ExtendedSmtLibParser
+from .vega.VegaSmtLibParser import VegaSmtLibParser
 
 def parse_fnode(fnode, sorts, depth=1):
     if fnode.is_and():
@@ -54,8 +55,8 @@ def parse_fnode(fnode, sorts, depth=1):
 
 def parse_cmd(cmd, sorts):
     if cmd.name == 'declare-datatypes':
-        values = [Value(x) for x in cmd.args.values]
-        sorts[cmd.args.name] = Sort(cmd.args.name, values)
+        values = [Value(x) for x in cmd.args[0].values]
+        sorts[cmd.args[0].name] = Sort(cmd.args[0].name, values)
         return []
     
     if cmd.name == 'declare-fun':
@@ -71,22 +72,33 @@ def parse_cmd(cmd, sorts):
         # return reduce(lambda r, x: r.append(parse_fnode(x)), cmd.args, [])
 
 ### @public
-def parse_smt2_file(file_name):
+def parse_and_get_script_from_file(file_name):
     with open(file_name) as f:
-        parser = ExtendedSmtLibParser()
-        script = parser.get_script(cStringIO(f.read()))
+        return parse_and_get_script_from_file_stream(f)
 
-        ### Transform to expressions
-        sorts = {}
-        expr = []
-        for cmd in script:
-            res = parse_cmd(cmd, sorts) # NOTE: Do not replace `sorts` with `{}`. `sorts` passes referrence to `sorts`
-            if res:
-                expr += res
+### @public
+def parse_and_get_script_from_file_stream(f):
+    # parser = ExtendedSmtLibParser()
+    # return parser.get_script(cStringIO(f.read()))
 
-        ### Calcuate domain
-        domain = set()
-        for sort in sorts.values():
-            domain |= sort.values
+    parser = VegaSmtLibParser()
+    return parser.get_script(f.read())
 
-        return expr, Sort('Domain', domain)
+### @public
+def parse_smt2_file(file_name):
+    script = parse_and_get_script_from_file(file_name)
+
+    ### Transform to expressions
+    sorts = {}
+    expr = []
+    for cmd in script:
+        res = parse_cmd(cmd, sorts) # NOTE: Do not replace `sorts` with `{}`. `sorts` passes referrence to `sorts`
+        if res:
+            expr += res
+
+    ### Calcuate domain
+    domain = set()
+    for sort in sorts.values():
+        domain |= sort.values
+
+    return expr, Sort('Domain', domain)

@@ -1,8 +1,7 @@
 from six.moves import cStringIO
 
 from ..Exceptions import *
-from .ExtendedSmtLibParser import ExtendedSmtLibParser
-from .parse import parse_cmd
+from .parse import parse_cmd, parse_and_get_script_from_file_stream
 from ..Solver import Solver, sat, unsat, unknown
 from ..AST import Sort
 
@@ -37,8 +36,7 @@ def get_model(expr, sorts):
     return m.sat
 
 def evaluate_smt2_file(file):
-    parser = ExtendedSmtLibParser()
-    script = parser.get_script(cStringIO(file.read()))
+    script = parse_and_get_script_from_file_stream(file)
 
     ### Transform to expressions
     sorts = {}
