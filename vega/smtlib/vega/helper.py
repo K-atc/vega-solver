@@ -22,6 +22,4 @@ def split_script_to_lines(raw_script):
                 if bracket_depth == 0:
                     lines.append(line)
                     line = ""
-
-    print(lines)
     return lines

@@ -3,20 +3,28 @@ from vega import *
 
 parser = argparse.ArgumentParser(description='parse input smt file and transform to output smt file')
 parser.add_argument("input")
-parser.add_argument("output")
+parser.add_argument("output", nargs='?')
 args = parser.parse_args()
 
+if args.output:
+    prefix = ""
+else:
+    prefix = "; "
+
 expr, domain = parse_smt2_file(args.input)
-print(expr)
-print("Domain = {}, Domain.values = {}".format(domain, domain.values))
+print("{}{}".format(prefix, expr))
+print("{}Domain = {}, Domain.values = {}".format(prefix, domain, domain.values))
 
 s = Solver(domain)
 s.add(*expr)
 m = s.model()
-print(m)
+print("{}{}".format(prefix, m))
 
 for v in m.variables.keys():
-    print("{} = {}".format(v, m[v]))
+    print("{}{} = {}".format(prefix, v, m[v]))
 
-with open(args.output, "w") as f:
-    f.write(s.to_smt2())
+if args.output:
+    with open(args.output, "w") as f:
+        f.write(s.to_smt2())
+else:
+    print(s.to_smt2())
