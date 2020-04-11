@@ -181,7 +181,7 @@ sat
 
 File size of this smt2 is 110 MB.
 
-vega (installed by pypy3) solves this large constraints in 41 seconds and requres 2.4 GB memory. 
+vega (installed by pypy3) solves this large constraints in 41 seconds and requires 2.4 GB memory. 
 Note that vega solves given constraint at `(check-sat)`.
 
 ```
