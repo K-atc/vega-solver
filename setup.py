@@ -18,7 +18,7 @@ setup(
     long_description_content_type='text/x-rst',
     author='Tomori Nao (@K_atc)',
     author_email='shiftx1026@gmail.com',
-    url='https://github.com/K-atc/vega',
+    url='https://github.com/K-atc/vega-solver',
     license=license,
     packages=find_packages(exclude=('tests', 'docs')),
 
