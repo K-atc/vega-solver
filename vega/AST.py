@@ -69,7 +69,7 @@ class Sort(AST):
         return hash(self.__repr__())
 
     def __eq__(a, b):
-        return a.name == b.name and a.values == b.values
+        return a.name == b.name or a.values == b.values
 
     def to_smt2(self):
         return self.name

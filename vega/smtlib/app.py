@@ -32,7 +32,7 @@ def get_model(expr, sorts):
                 ans = "(or {})".format(' '.join([x.name for x in m[v]]))
             else:
                 ans = list(m[v])[0].name
-            print("  (define-fun {} () Any\n    (as {} Any))".format(v, ans))
+            print("  (define-fun {name} () {sort_name}\n    (as {ans} {sort_name}))".format(name=v, sort_name=v.sort.name, ans=ans))
         print(")")
     return m.sat
 
@@ -52,7 +52,6 @@ def evaluate_smt2_file(file):
         elif cmd.name in ['check-sat']:
             sat = check_sat(expr, sorts)
         elif cmd.name in ['get-model']:
-            import ipdb; ipdb.set_trace()
             sat = get_model(expr, sorts)
         elif cmd.name in ['set-info']:
             pass
@@ -62,5 +61,3 @@ def evaluate_smt2_file(file):
         if sat == unsat:
             print('(error "command #{}: model is not available")'.format(line_no))
             exit(1)
-
-

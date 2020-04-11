@@ -3,3 +3,6 @@ class UnhandledCaseError(Exception):
 
 class ExecutionError(Exception):
     pass
+
+class UnsatException(Exception):
+    pass

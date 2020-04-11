@@ -256,13 +256,16 @@ class Solver(FeatureCapability, SmtlibCapability):
         ref_left = self.ref.getRef(left)
         variables_ref_left = self.variables[ref_left]
         assert isinstance(variables_ref_left, set), "self.variables[{}] = {}".format(ref_left, variables_ref_left)
+        
         if right in variables_ref_left:
             # self.variables[ref_left] &= ref_left.sort.values - set([right]) # intersection
-            self.variables[ref_left] &= self.domain.values - set([right]) # intersection
-        if self.feature.debug: assert self.variables[ref_left], "self.variables[{}] is blank".format(ref_left)
+            # self.variables[ref_left] &= self.domain.values - set([right]) # intersection
+            self.variables[ref_left].remove(right)
+        
         if self.variables[ref_left]:
             return sat
         else:
+            if self.feature.debug: raise UnsatException("self.variables[{}] is blank".format(ref_left))
             return unsat
 
     ### Oneshot side-effect less satisfiability check
@@ -361,7 +364,8 @@ class Solver(FeatureCapability, SmtlibCapability):
         for v in filter(lambda e: x in e.getVariables(), expr.v):
             res = self.__evaluate(v, self.__or_eq)
             if res == unsat:
-                self.variables[ref_x] = prev_set # Restore state
+                self.variables[ref_x] = prev_set # Restore state for debugging
+                if self.feature.debug: raise UnsatException("expression {} produces unsat".format(v))
                 return unsat
         
         ### Merge old set and new set
@@ -374,7 +378,8 @@ class Solver(FeatureCapability, SmtlibCapability):
             return sat
         else: # Blank
             if self.feature.debug: print("[!] __or_on_x: symvar Ref({}) = {} cannot be any values (prev={}, current={})".format(x, ref_x, prev_set, current_set))
-            self.variables[ref_x] = prev_set # Restore state
+            self.variables[ref_x] = prev_set # Restore state for debugging
+            if self.feature.debug: raise UnsatException("variables[{}] is blank".format(ref_x))
             return unsat
 
     def __eq(self, expr, func):

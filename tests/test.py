@@ -52,6 +52,21 @@ class TestNotAndOr(unittest.TestCase):
         self.assertEqual(m[x], set([Int, PointerOffset]))
         self.assertEqual(m[y], set([Int]))
 
+    def test_And_Or_and_Not_Eq(self):
+        print("\n[*] And(Or(x == Int, x == PointerOffset), x != Int)")
+        s = Solver(Any)
+        s.add(And(
+            Or(
+                Eq(x, PointerOffset),
+                Eq(x, Pointer),
+            ),
+            Not(Eq(x, Int)),
+        ))
+        m = s.model()
+        print(m)
+        self.assertEqual(m.sat, sat)
+        self.assertEqual(m[x], set([PointerOffset, Pointer]))
+
     def test_join_Or_Or(self):
         print("\n[*] x == {Pointer, PointerOffset}, x == {Int, PointerOffset}")
         s = Solver(Any)
