@@ -1,7 +1,7 @@
 from vega import *
 
 ### Define values with name a, b, c, d
-a, b, c, d = Value('a'), Value('b'), Value('c'), Value('c')
+a, b, c, d = Value('a'), Value('b'), Value('c'), Value('d')
 ### Define domain with name Domain
 Domain = Sort('Domain', [a, b, c, d])
 

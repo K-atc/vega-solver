@@ -58,7 +58,7 @@ In this demo, we check following points:
 from vega import *
 
 ### Define values with name a, b, c, d
-a, b, c, d = Value('a'), Value('b'), Value('c'), Value('c')
+a, b, c, d = Value('a'), Value('b'), Value('c'), Value('d')
 ### Define domain with name Domain
 Domain = Sort('Domain', [a, b, c, d])
 
@@ -89,8 +89,8 @@ Execution result:
 
 ```
 $ python3 sample/sample.py 
-Model(sat=Sat, {x: {c, b}, y: Ref(x), z: Ref(x)})
-{b, c}
+Model(sat=sat, {z: Ref(x), y: Ref(x), x: {c, b}})
+{c, b}
 ```
 
 We found that vega models that *x* is *b* or *c* and this is correct solution for this constraint.
