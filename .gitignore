@@ -6,3 +6,5 @@ __pycache__/
 /*.egg-info
 /vega-solver-*.*.*
 /*.smt
+
+sample/gzip.-l.trace.constraint.smt2

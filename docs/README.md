@@ -159,39 +159,49 @@ $ python3 sample/sample_abstract_interpretation.py
 ```
 
 ### SMT-LIB support
-TODO: What is SMT-LIB
+vega has [SMT-LIB language](http://smtlib.cs.uiowa.edu/language.shtml) support as z3 do. SMT-LIB language is oriented for SMT solver and describes formulas.
 
-TODO: what is this and how to run
+Command usage is similar to z3.
 
+```shell
+$ vega -smt2 tests/test_smtlib_1.smt2
+sat
+(model
+  (define-fun x () Any
+    (as (or a c) Any))
+  (define-fun y () Any
+    (as b Any))
+)
+```
 
 ### Performance benchmark
-`sample/simple-readelf.trace.constraint.smt2` contains:
-* 306903 assertions
-* 603467 variables (number of `declare-fun`)
+`sample/gzip.-l.trace.constraint.smt2` contains:
+* 397784 assertions
+* 935725 variables (number of `declare-fun`)
 
-File size of this smt2 is 73 MB.
+File size of this smt2 is 110 MB.
 
-vega (installed by pypy3) solves this large constraints in 40 seconds and requres 5 GB memory. 
+vega (installed by pypy3) solves this large constraints in 41 seconds and requres 2.4 GB memory. 
 Note that vega solves given constraint at `(check-sat)`.
 
 ```
-$ /usr/bin/time -v vega -smt2 sample/simple-readelf.trace.constraint.smt2
+$ /usr/bin/time -v vega -smt2 sample/gzip.-l.trace.constraint.smt2
 sat
-        Command being timed: "vega -smt2 sample/simple-readelf.trace.constraint.smt2"
-        User time (seconds): 36.59
-        System time (seconds): 3.80
+        Command being timed: "vega -smt2 sample/gzip.-l.trace.constraint.smt2"
+        User time (seconds): 38.58
+        System time (seconds): 2.62
         Percent of CPU this job got: 99%
-        Elapsed (wall clock) time (h:mm:ss or m:ss): 0:40.40
+        Elapsed (wall clock) time (h:mm:ss or m:ss): 0:41.21
         Average shared text size (kbytes): 0
         Average unshared data size (kbytes): 0
         Average stack size (kbytes): 0
         Average total size (kbytes): 0
-        Maximum resident set size (kbytes): 5424916
+        Maximum resident set size (kbytes): 2390212
         Average resident set size (kbytes): 0
         Major (requiring I/O) page faults: 0
-        Minor (reclaiming a frame) page faults: 1851475
+        Minor (reclaiming a frame) page faults: 884111
         Voluntary context switches: 5
-        Involuntary context switches: 172
+        Involuntary context switches: 138
         Swaps: 0
         File system inputs: 0
         File system outputs: 0
@@ -205,6 +215,41 @@ sat
 In case of z3:
 
 ```
-$ (cat sample/simple-readelf.trace.constraint.smt2; echo "(get-model)") | /usr/bin/time -v z3 -in > /dev/null
-
+$ (cat sample/gzip.-l.trace.constraint.smt2; echo "(get-model)") | /usr/bin/time -v z3 -in | tail
+Command exited with non-zero status 1
+        Command being timed: "z3 -in"
+        User time (seconds): 65.77
+        System time (seconds): 1.15
+        Percent of CPU this job got: 99%
+        Elapsed (wall clock) time (h:mm:ss or m:ss): 1:06.94
+        Average shared text size (kbytes): 0
+        Average unshared data size (kbytes): 0
+        Average stack size (kbytes): 0
+        Average total size (kbytes): 0
+        Maximum resident set size (kbytes): 847480
+        Average resident set size (kbytes): 0
+        Major (requiring I/O) page faults: 0
+        Minor (reclaiming a frame) page faults: 297452
+        Voluntary context switches: 2
+        Involuntary context switches: 1239
+        Swaps: 0
+        File system inputs: 0
+        File system outputs: 0
+        Socket messages sent: 0
+        Socket messages received: 0
+        Signals delivered: 0
+        Page size (bytes): 4096
+        Exit status: 1
+    (as Int Any))
+  (define-fun Mem_7ffff7de1c98_555555556798_573717 () Any
+    (as Int Any))
+  (define-fun Mem_7ffff7de19d8_5555555565d8_497565 () Any
+    (as Int Any))
+  (define-fun Mem_7ffff7de19d8_5555555561d1_312496 () Any
+    (as Int Any))
+  (define-fun Mem_7ffff7de19d8_555555556338_373436 () Any
+    (as Int Any))
+)
 ```
+
+We found that vega is faster than z3, but requires much memory.

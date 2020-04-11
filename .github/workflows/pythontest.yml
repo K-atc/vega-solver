@@ -30,11 +30,11 @@ jobs:
       run: |
         python3 tests/test.py
     - name: Test smtlib and command line
-      run:
+      run: |
         ### Load smt and dump smt and use vega command
-        - python3 tests/test_smtlib.py tests/test_smtlib_1.smt2 /tmp/test.smt2 && vega -smt2 /tmp/test.smt2
+        python3 tests/test_smtlib.py tests/test_smtlib_1.smt2 /tmp/test.smt2 && vega -smt2 /tmp/test.smt2
         ### Load and solve
-        - vega -smt2 tests/test_smtlib_1.smt2
-        - vega -smt2 tests/test_smtlib_2.smt2
+        vega -smt2 tests/test_smtlib_1.smt2
+        vega -smt2 tests/test_smtlib_2.smt2
       env:
         PATH: /home/runner/.local/bin:$PATH
