@@ -163,7 +163,22 @@ vega has [SMT-LIB language](http://smtlib.cs.uiowa.edu/language.shtml) support a
 
 Command usage is similar to z3.
 
-```shell
+```
+$ cat tests/test_smtlib_1.smt2
+(set-info :status unknown)
+(declare-datatypes () ((Any (a) (b) (c))))
+; (declare-fun a () Any)
+; (declare-fun b () Any)
+; (declare-fun c () Any)
+(declare-fun x () Any)
+(declare-fun y () Any)
+(assert
+ (or (= x a) (= x c)))
+(assert
+ (=> (and (distinct x b) true) (= y b)))
+(check-sat)
+(get-model)
+
 $ vega -smt2 tests/test_smtlib_1.smt2
 sat
 (model
@@ -171,6 +186,19 @@ sat
     (as (or a c) Any))
   (define-fun y () Any
     (as b Any))
+)
+```
+
+In case of z3:
+
+```
+$ z3 -smt2 tests/test_smtlib_1.smt2
+sat
+(model
+  (define-fun y () Any
+    b)
+  (define-fun x () Any
+    a)
 )
 ```
 
