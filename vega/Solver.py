@@ -10,12 +10,13 @@ from . import Satisfiability
 from .Feature import Feature, FeatureCapability
 from . import Tactic
 from .smtlib import SmtlibCapability
+from .ProfileCapability import ProfileCapability
 
 sat = Satisfiability.Sat()
 unsat = Satisfiability.Unsat()
 unknown = Satisfiability.Unknown()
 
-class Solver(FeatureCapability, SmtlibCapability):
+class Solver(FeatureCapability, SmtlibCapability, ProfileCapability):
     def __init__(self, domain, feature=Feature()):
         assert isinstance(domain, AST.Sort)
         assert isinstance(feature, Feature)

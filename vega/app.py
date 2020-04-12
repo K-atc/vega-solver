@@ -14,17 +14,19 @@ def main():
     parser.add_argument("-smt2", action="store_true", default=True, help='use parser for SMT 2 input format (default: true)')
     parser.add_argument("-in", dest="_in", action="store_true", help='read formula from standard input')
     parser.add_argument("file", nargs="?")
+    parser.add_argument("--profile", action="store_true")
     args = parser.parse_args()
 
     if args.smt2:
         if args._in:
-            evaluate_smt2_file(sys.stdin)
+            evaluate_smt2_file(sys.stdin, args.profile)
         else:
             if args.file:
                 with open(args.file) as f:
-                    evaluate_smt2_file(f)
+                    evaluate_smt2_file(f, args.profile)
             else:
                 print("[!] Specify `file`")
                 usage(parser)
 
-    
+if __name__ == "__main__":
+    main()

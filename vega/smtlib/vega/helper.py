@@ -1,9 +1,9 @@
-def split_script_to_lines(raw_script):
+def split_script_to_lines(file):
     bracket_depth = 0
     lines = []
     line = ""
     comment_line = False
-    for c in raw_script:
+    for c in file.read():
         if c == ';':
             comment_line = True
         elif c == '\r':

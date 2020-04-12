@@ -107,8 +107,8 @@ class VegaSmtLibParser:
             name = line
             return Command(name, [])
 
-    def get_script(self, raw_script):
+    def get_script(self, file):
         script = []
-        for line in split_script_to_lines(raw_script):
+        for line in split_script_to_lines(file):
             script.append(self.parse_command(line))
         return script

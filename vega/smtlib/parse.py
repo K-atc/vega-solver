@@ -82,7 +82,7 @@ def parse_and_get_script_from_file_stream(f):
     # return parser.get_script(cStringIO(f.read()))
 
     parser = VegaSmtLibParser()
-    return parser.get_script(f.read())
+    return parser.get_script(f)
 
 ### @public
 def parse_smt2_file(file_name):

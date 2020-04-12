@@ -15,12 +15,12 @@ class SmtlibCapability:
 
         ### Define domain
         res.append("(declare-datatypes () (({} {})))".format(self.domain.name, ' '.join(["({})".format(x) for x in self.domain.values])))
+        for v in self.domain.values: # reffers domain.values to avoid redefine symbols (e.g. a of sort s, a of sort t)
+            res.append("; (declare-fun {} () {})".format(v.name, self.domain.name))
 
         ### Define sorts
         for sort in sorts: # TODO
             res.append("(declare-datatypes () (({} {})))".format(sort.name, ' '.join(["({})".format(x) for x in sort.values])))
-        for v in self.domain.values: # reffers domain.values to avoid redefine symbols (e.g. a of sort s, a of sort t)
-            res.append("(declare-fun {} () {})".format(v.name, self.domain.name))
 
         ### Define all variables with same domain (sort)
         for v in self.variables.keys():
@@ -37,4 +37,4 @@ class SmtlibCapability:
 
         res.append("(check-sat)")
         
-        return '\n'.join(res)
+        return '\n'.join(res) + '\n'
