@@ -140,7 +140,10 @@ class NOp(AST):
         return reduce(lambda r, expr: r | expr.getConditionVariables(is_parent_condition), self.v, set())
 
     def to_smt2(self):
-        return "({} {})".format(self.__class__.__name__.lower(), ' '.join([x.to_smt2() for x in self.v]))
+        if self.v:
+            return "({} {})".format(self.__class__.__name__.lower(), ' '.join([x.to_smt2() for x in self.v]))
+        else:
+            return "true"
 
 class UniOp(NOp):
     def __init__(self, v1):

@@ -11,6 +11,7 @@ from .Feature import Feature, FeatureCapability
 from . import Tactic
 from .smtlib import SmtlibCapability
 from .ProfileCapability import ProfileCapability
+from .Writer import FileWriter, StringWriter
 
 sat = Satisfiability.Sat()
 unsat = Satisfiability.Unsat()
@@ -190,17 +191,35 @@ class Solver(FeatureCapability, SmtlibCapability, ProfileCapability):
         raise ExecutionError('Implement me')
         self.satisfiability = unknown
 
-    def dumpConstraint(self):
-        return '\n'.join([str(x) for x in self.constraints])
+    def dumpConstraint(self, file=None):
+        if file:
+            out = FileWriter(file)
+        else:
+            out = StringWriter()
+        for x in self.constraints:
+            out.write(str(x))
+        return out.finalize()
 
-    def dumpPostConstraint(self):
-        return '\n'.join([str(x) for x in self.post_constraints])
+    def dumpPostConstraint(self, file=None):
+        if file:
+            out = FileWriter(file)
+        else:
+            out = StringWriter()
+        for x in self.post_constraints:
+            out.write(str(x))
+        return out.finalize()
 
-    def dumpRefMap(self):
-        return self.ref.dump()
+    def dumpRefMap(self, file=None):
+        return self.ref.dump(file)
 
-    def dumpVariables(self):
-        return '\n'.join(['{} = {}'.format(k, v) for k, v in self.variables.items()])
+    def dumpVariables(self, file=None):
+        if file:
+            out = FileWriter(file)
+        else:
+            out = StringWriter()
+        for k, v in self.variables.items():
+            out.write('{} = {}'.format(k, v))
+        return out.finalize()
 
     ### @return: sat or unsat
     def __and_eq(self, left, right):

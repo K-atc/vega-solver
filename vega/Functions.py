@@ -7,4 +7,7 @@ def eq(a, b):
     return a == b
 
 def is_expr(expr):
-    return isinstance(expr, AST)
+    if isinstance(expr, And) or isinstance(expr, Or):
+        return expr.v # Assume blank And() is not expression
+    else:
+        return isinstance(expr, AST)

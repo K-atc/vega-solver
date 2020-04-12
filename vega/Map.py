@@ -2,6 +2,7 @@
 # from functools import lru_cache
 
 from . import AST
+from .Writer import FileWriter, StringWriter
 
 class VariableToVariableMap:
     def __init__(self, values={}):
@@ -40,9 +41,15 @@ class VariableToVariableMap:
     def __bool__(self):
         return bool(self.values)
 
-    def dump(self):
+    def dump(self, file=None):
+        if file:
+            out = FileWriter(file)
+        else:
+            out = StringWriter()
         if len(self.values) > 0:
-            return '\n'.join(['{} -> {}'.format(k, v) for k, v in self.values.items()])
+            for k, v in self.values.items():
+                out.write('{} -> {}'.format(k, v))
+            return out.finalize()
         else:
             return '()'
 
