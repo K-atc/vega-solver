@@ -71,7 +71,7 @@ class Solver(FeatureCapability, SmtlibCapability, ProfileCapability):
         def __model_constraints(self, debug):
             for i, expr in enumerate(self.constraints[self.model_start:]): # Optimization
                 try:
-                    if debug and i > 0 and i % 100000 == 0: print("[*] Solver::model(): Solving constraint #{}".format(i)) # DEBUG
+                    if debug and i > 0 and i % 1000000 == 0: print("[*] Solver::model(): Solving constraint #{}".format(i)) # DEBUG
                     self.satisfiability = self.__evaluate(expr, self.__and_eq)
                     if debug: assert self.satisfiability == sat
                     if self.satisfiability == unsat:
@@ -106,7 +106,7 @@ class Solver(FeatureCapability, SmtlibCapability, ProfileCapability):
                 skip_stop = len(unvisited_post_constraints)
                 for i, expr in enumerate(unvisited_post_constraints):
                     try:
-                        if debug and i > 0 and i % 100000 == 0: print("[*] Solver::model(): Solving unvisited post-constraint #{}".format(i)) # DEBUG
+                        if debug and i > 0 and i % 1000000 == 0: print("[*] Solver::model(): Solving unvisited post-constraint #{}".format(i)) # DEBUG
                         
                         cond_vars = set(map(lambda v: self.ref.getRef(v), expr.getConditionVariables()))
                         # print("cond_vars = {}".format(cond_vars)) # DEBUG
@@ -131,7 +131,7 @@ class Solver(FeatureCapability, SmtlibCapability, ProfileCapability):
             def __simple(self, debug):
                 for i, expr in enumerate(self.post_constraints):
                     try:
-                        if debug and i > 0 and i % 100000 == 0: print("[*] Solver::model(): Solving post-constraint #{}".format(i)) # DEBUG
+                        if debug and i > 0 and i % 1000000 == 0: print("[*] Solver::model(): Solving post-constraint #{}".format(i)) # DEBUG
                         self.satisfiability = self.__evaluate_post(expr)
                         if debug: assert self.satisfiability == sat
                         if self.satisfiability == unsat:
