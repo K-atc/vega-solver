@@ -124,6 +124,7 @@ class Const(AST):
 
 class NOp(AST):
     def __init__(self, *v):
+        assert len(v) > 0
         assert checkAllItemsAreAST(*v), "v={}".format(v)
         self.v = list(v)
 
