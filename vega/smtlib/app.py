@@ -4,6 +4,7 @@ from ..Exceptions import *
 from .parse import parse_cmd, parse_and_get_script_from_file_stream
 from ..Solver import Solver, sat, unsat, unknown
 from ..AST import Sort
+from ..Feature import Feature
 from ..Tactic import Simple2
 
 def calcuate_domain(sorts):
@@ -57,7 +58,7 @@ def evaluate_smt2_file(file, profile):
         elif cmd.name in ['check-sat']:
             ### Initialize solver
             Domain = calcuate_domain(sorts)
-            solver = Solver(Domain, tactic=Simple2())
+            solver = Solver(Domain, Feature(tactic=Simple2()))
 
             sat = check_sat(expr, solver, profile)
         elif cmd.name in ['get-model']:
