@@ -8,6 +8,6 @@ def eq(a, b):
 
 def is_expr(expr):
     if isinstance(expr, And) or isinstance(expr, Or):
-        return expr.v # Assume blank And() is not expression
+        return bool(expr.v) # Assume blank And() is not expression
     else:
         return isinstance(expr, AST)
