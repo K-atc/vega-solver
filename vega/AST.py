@@ -6,6 +6,11 @@ def checkAllItemsAreAST(*z):
 def checkAllItemsAreValue(*z):
     return reduce(lambda r, x: r and (isinstance(x, Value)), z, True)
 
+def fmt_comment(comment):
+    if comment:
+        return " ; {}".format(comment)
+    return ""
+
 class AST:
     def __repr__(self):
         return "{}()".format(self.__class__.__name__)
@@ -123,13 +128,14 @@ class Const(AST):
         return self.__class__.__name__
 
 class NOp(AST):
-    def __init__(self, *v):
+    def __init__(self, *v, comment=""):
         assert len(v) > 0
         assert checkAllItemsAreAST(*v), "v={}".format(v)
         self.v = list(v)
+        self.comment = comment
 
     def __repr__(self):
-        return "{}({})".format(self.__class__.__name__, ', '.join(['{}'.format(x) for x in self.v]))
+        return "{}({}){}".format(self.__class__.__name__, ', '.join(['{}'.format(x) for x in self.v]), fmt_comment(self.comment))
 
     def __eq__(a, b):
         return a.v == b.v
@@ -147,12 +153,13 @@ class NOp(AST):
             return "true"
 
 class UniOp(NOp):
-    def __init__(self, v1):
+    def __init__(self, v1, comment=""):
         assert isinstance(v1, AST)
         self.v1 = v1
+        self.comment = comment
     
     def __repr__(self):
-        return "{}({})".format(self.__class__.__name__, self.v1)
+        return "{}({}){}".format(self.__class__.__name__, self.v1, fmt_comment(self.comment))
 
     def __eq__(a, b):
         return a.v1 == b.v1
@@ -167,14 +174,15 @@ class UniOp(NOp):
         return "({} {})".format(self.__class__.__name__.lower(), self.v1.to_smt2())
 
 class BinOp(NOp):
-    def __init__(self, v1, v2):
+    def __init__(self, v1, v2, comment=""):
         assert isinstance(v1, AST)
         assert isinstance(v2, AST)
         self.v1 = v1
         self.v2 = v2
+        self.comment = comment
     
     def __repr__(self):
-        return "{}({}, {})".format(self.__class__.__name__, self.v1, self.v2)
+        return "{}({}, {}){}".format(self.__class__.__name__, self.v1, self.v2, fmt_comment(self.comment))
 
     def __eq__(a, b):
         return a.v1 == b.v1 and a.v2 == b.v2
