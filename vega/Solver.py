@@ -252,7 +252,8 @@ class Solver(FeatureCapability, SmtlibCapability, ProfileCapability):
                     ### i.e. {y |-> {a}} |- {y == a} ~> {x |-> {a}} |- {y == a, y == x}
                     self.variables[ref_left] &= variables_left # intersection
 
-                self.variables[left] = AST.Ref(right)
+                if left != ref_left:
+                    self.variables[left] = AST.Ref(right)
 
                 if not self.variables[ref_left]: # blank
                     return unsat
@@ -302,10 +303,14 @@ class Solver(FeatureCapability, SmtlibCapability, ProfileCapability):
                     return sat
                 else:
                     return unsat
+            
             elif isinstance(expr.v2, AST.Value):
                 ref_v1 = self.ref.getRef(expr.v1)
                 variables_ref_v1 = self.variables[ref_v1]
-                assert isinstance(variables_ref_v1, set), "self.variables[{}] = {}".format(ref_v1, variables_ref_v1)
+                
+                if not isinstance(variables_ref_v1, set): # Buggy case variables = {x = Ref(y)}, Ref(y) = x
+                    raise ExecutionError("self.variables[{}] = {}".format(ref_v1, variables_ref_v1))
+                
                 if expr.v2 in variables_ref_v1:
                     return sat
                 else:

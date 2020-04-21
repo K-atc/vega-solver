@@ -52,6 +52,19 @@ class TestNotAndOr(unittest.TestCase):
         self.assertEqual(m[x], set([Int, PointerOffset]))
         self.assertEqual(m[y], set([Int]))
 
+    def test_And_Not_Eq(self):
+        print("\n[*] And(x != Int, x != Int)")
+        s = Solver(Any)
+        s.add(And(
+            Not(Eq(x, Int)),
+            Not(Eq(y, Int)),
+        ))
+        m = s.model()
+        print(m)
+        self.assertEqual(m.sat, sat)
+        self.assertEqual(m[x], Any.values - set([Int]))
+        self.assertEqual(m[y], Any.values - set([Int]))
+
     def test_And_Or_and_Not_Eq(self):
         print("\n[*] And(Or(x == Int, x == PointerOffset), x != Int)")
         s = Solver(Any)
@@ -450,6 +463,29 @@ class TestImpliesStatement(unittest.TestCase):
         print(m)
         assert m.sat
         assert m[x] == set([Int])
+
+    ### FIXME: Unsupported (Cannot handle Or(Not(Eq(...), ...)))
+    # def test_Implies_Or_A_B_And_A_B(self):
+    #     print("\n[*] Test implies statement: x != Int, Implies(Or(x != Int, y != Int), And(x != Int, y != Int))")
+    #     s = Solver(Any, Feature(debug=True, tactic=Tactic.Simple2()))
+    #     s.add(
+    #         Not(Eq(x, Int))
+    #     )
+    #     s.add(Implies(
+    #         Or(
+    #             Not(Eq(x, Int)),
+    #             Not(Eq(y, Int)),
+    #         ),
+    #         And(
+    #             Not(Eq(x, Int)),
+    #             Not(Eq(y, Int)),
+    #         ),
+    #     ))
+    #     m = s.model()
+    #     print(m)
+    #     self.assertEqual(m.sat, sat)
+    #     self.assertEqual(m[x], Any.values - set([Int]))
+    #     self.assertEqual(m[y], Any.values - set([Int]))
 
 
 class TestPloblemOfReorderingConstraints(unittest.TestCase):
